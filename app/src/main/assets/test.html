@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8"/>
+    <script src="party.js" type="text/javascript" ></script>
+    <script>
+        var TestBean={
+				name:"lili",
+				sex:"男",
+				age:12
+			};
+		var test={
+		}
+
+    </script>
+</head>
+<body>
+
+<!--是不是调用很方便，很简单，回调也能如此轻松？-->
+<button onclick="Local.execute('Test',TestBean,function(json){
+			alert(json);
+		})" >测试</button>
+</body><br/>
+<button onclick="Local.execute('ToAnotherActivity',test,function(json){
+
+		})" >跳转activity</button>
+</body>
+</html>
