@@ -1,11 +1,16 @@
 package com.xiaoyunchengzhu.androidandh5.webviewpakage;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 /**
  * Created by TL on 2016/5/31.
@@ -13,9 +18,10 @@ import android.webkit.WebViewClient;
 public class CustomWebViewClient extends WebViewClient {
 
     private View showError;
-
-    public CustomWebViewClient(View showError) {
+    private Context context;
+    public CustomWebViewClient(View showError, Context context) {
         this.showError = showError;
+        this.context=context;
     }
 
     @Override
@@ -28,7 +34,20 @@ public class CustomWebViewClient extends WebViewClient {
 
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        return super.shouldOverrideUrlLoading(view, url);
+        // 处理自定义scheme http开头，包含http ,https
+        if (!url.startsWith("http")) {
+            try {
+                Intent intent = new Intent(Intent.ACTION_VIEW,
+                        Uri.parse(url));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                context.startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override

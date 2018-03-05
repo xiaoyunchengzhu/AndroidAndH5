@@ -36,7 +36,7 @@ public class WebViewActivity extends Activity {
         showError = this.findViewById(R.id.WebViewActivityShowError);
         webView = (WebView) this.findViewById(R.id.WebViewActivityWebView);
         webViewManger = new WebViewManger(this, webView);
-        webView.setWebViewClient(new CustomWebViewClient(showError));
+        webView.setWebViewClient(new CustomWebViewClient(showError,this));
     }
 
     @Override
