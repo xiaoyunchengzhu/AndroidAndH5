@@ -73,7 +73,7 @@ public class WebViewManger implements View.OnClickListener{
         webView.setWebChromeClient(new CustomWebChromClient(activity, WebViewActivity.FILECHOOSER_RESULTCODE, WebViewActivity.REQUEST_SELECT_FILE));
         webView.addJavascriptInterface(new AndroidToJs(activity, webView), "LocalNative");
         setCookie();
-        cpImage();
+        imageInit();
     }
 
     public void load(String url) {
@@ -100,11 +100,9 @@ public class WebViewManger implements View.OnClickListener{
     }
     private String picUrl=null;
     private int x,y;
-    boolean ismove=false;
-    long motionTime=0;
     private PopupWindow mPopWindow;
     private
-    void cpImage(){
+    void imageInit(){
         mPopWindow=new PopupWindow(activity);
         View contentView = LayoutInflater.from(activity).inflate(R.layout.pop_img, null);
         mPopWindow = new PopupWindow(contentView,
@@ -177,7 +175,12 @@ public class WebViewManger implements View.OnClickListener{
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             fos.close();
-            onSaveSuccess();
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(activity, "保存成功", Toast.LENGTH_SHORT).show();
+                }
+            });
         } catch (IOException e) {
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -189,14 +192,7 @@ public class WebViewManger implements View.OnClickListener{
         }
     }
 
-    private void onSaveSuccess() {
-        activity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Toast.makeText(activity, "保存成功", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
+
 
     @Override
     public void onClick(View v) {
