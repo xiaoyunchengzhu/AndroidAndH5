@@ -37,17 +37,25 @@ public class CustomWebViewClient extends WebViewClient {
         // 处理自定义scheme http开头，包含http ,https
         if (!url.startsWith("http")) {
             try {
-                Intent intent = new Intent(Intent.ACTION_VIEW,
-                        Uri.parse(url));
-                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-                        | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 context.startActivity(intent);
             } catch (Exception e) {
                 e.printStackTrace();
+                Log.i("no","noactivity");
             }
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onPageFinished(WebView view, String url) {
+        view.getSettings().setBlockNetworkImage(false);
+        if (!view.getSettings().getLoadsImagesAutomatically()) {
+            view.getSettings().setLoadsImagesAutomatically(true);
+        }
+        super.onPageFinished(view, url);
     }
 
     @Override

@@ -3,6 +3,8 @@ package com.xiaoyunchengzhu.androidandh5.webviewpakage;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -11,11 +13,24 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.PopupWindow;
 import android.widget.SeekBar;
 import android.widget.Toast;
+
+import com.xiaoyunchengzhu.androidandh5.R;
+import com.xiaoyunchengzhu.httpapi.http.HttpApi;
+import com.xiaoyunchengzhu.httpapi.net.APIManager;
+import com.xiaoyunchengzhu.httpapi.net.Api;
+import com.xiaoyunchengzhu.httpapi.net.BitmapCallBackResult;
+import com.xiaoyunchengzhu.httpapi.net.CallBackResult;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -26,11 +41,13 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
+import static android.content.Context.CLIPBOARD_SERVICE;
+
 
 /**
  * Created by TL on 2016/5/31.
  */
-public class WebViewManger {
+public class WebViewManger implements View.OnClickListener{
 
     private WebView webView;
     private WebViewActivity activity;
@@ -51,7 +68,8 @@ public class WebViewManger {
         //添加useragent
         String ua = webView.getSettings().getUserAgentString();
         webView.getSettings().setUserAgentString(ua + " " + "");
-
+        //阻塞加载图片
+        webView.getSettings().setBlockNetworkImage(true);
         webView.setWebChromeClient(new CustomWebChromClient(activity, WebViewActivity.FILECHOOSER_RESULTCODE, WebViewActivity.REQUEST_SELECT_FILE));
         webView.addJavascriptInterface(new AndroidToJs(activity, webView), "LocalNative");
         setCookie();
@@ -81,7 +99,32 @@ public class WebViewManger {
         Log.i("cookie",cookieManager.getCookie("www.baidu.com"));
     }
     private String picUrl=null;
+    private int x,y;
+    boolean ismove=false;
+    long motionTime=0;
+    private PopupWindow mPopWindow;
+    private
     void cpImage(){
+        mPopWindow=new PopupWindow(activity);
+        View contentView = LayoutInflater.from(activity).inflate(R.layout.pop_img, null);
+        mPopWindow = new PopupWindow(contentView,
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        mPopWindow.setContentView(contentView);
+        Button save= (Button) contentView.findViewById(R.id.btn_save);
+        Button cp= (Button) contentView.findViewById(R.id.btn_cp);
+        Button cancel= (Button) contentView.findViewById(R.id.btn_cancel);
+        save.setOnClickListener(this);
+        cp.setOnClickListener(this);
+        cancel.setOnClickListener(this);
+        webView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                x= (int) event.getX();
+                y= (int) event.getY();
+                return false;
+            }
+        });
+
         webView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
@@ -89,72 +132,38 @@ public class WebViewManger {
                 // 如果是图片类型或者是带有图片链接的类型
                 if (hitTestResult.getType() == WebView.HitTestResult.IMAGE_TYPE ||
                         hitTestResult.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
-                    // 弹出保存图片的对话框
                     picUrl = hitTestResult.getExtra();
-                    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle("提示");
-                    builder.setMessage("保存图片"+picUrl+"到本地");
-                    builder.setPositiveButton("确认", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                           //获取图片链接
-                            //保存图片到相册
-                            new Thread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    url2bitmap(picUrl);
-                                }
-                            }).start();
-                        }
-                    });
-                    builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                        // 自动dismiss
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
+                    mPopWindow.showAtLocation(webView, Gravity.TOP|Gravity.LEFT, x, y);
                     return true;
                 }
-                return false;//保持长按可以复制文字
+                return false;
             }
         });
     }
-    public void url2bitmap(String url) {
-        Bitmap bm = null;
-        try {
-            URL iconUrl = new URL(url);
-            URLConnection conn = iconUrl.openConnection();
-            HttpURLConnection http = (HttpURLConnection) conn;
-            int length = http.getContentLength();
-            conn.connect();
-            // 获得图像的字符流
-            InputStream is = conn.getInputStream();
-            BufferedInputStream bis = new BufferedInputStream(is, length);
-            bm = BitmapFactory.decodeStream(bis);
-            bis.close();
-            is.close();
-            if (bm != null) {
-                save2Album(bm);
+    public void savePic(String url) {
+        APIManager.createApi(new HttpApi(url)).execute(new BitmapCallBackResult() {
+            @Override
+            public void success(Api api, Bitmap result) {
+                saveBitmap(result);
             }
-        } catch (Exception e) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Toast.makeText(activity, "保存失败", Toast.LENGTH_SHORT).show();
-                }
-            });
-            e.printStackTrace();
-        }
+
+            @Override
+            public void failure(Api api, String error) {
+                Toast.makeText(activity, "保存失败", Toast.LENGTH_SHORT).show();
+            }
+        });
+
     }
-    private void save2Album(Bitmap bitmap) {
-        File appDir = new File(Environment.getExternalStorageDirectory(), "相册名称");
+    private void saveBitmap(Bitmap bitmap) {
+        File appDir = new File(Environment.getExternalStorageDirectory(), "com.xiaoyunchengzhu.androidandh5");
         if (!appDir.exists()) {
             appDir.mkdir();
         }
         String[] str = picUrl.split("/");
         String fileName = str[str.length - 1];
+        if (fileName.length()>20) {
+            fileName=fileName.substring(fileName.length()-10,fileName.length());
+        }
         File file = new File(appDir, fileName);
         if (!file.exists()){
             try {
@@ -168,7 +177,7 @@ public class WebViewManger {
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
             fos.close();
-            onSaveSuccess(file);
+            onSaveSuccess();
         } catch (IOException e) {
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -180,14 +189,39 @@ public class WebViewManger {
         }
     }
 
-    private void onSaveSuccess(final File file) {
+    private void onSaveSuccess() {
         activity.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-//                sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(file)));
                 Toast.makeText(activity, "保存成功", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            //保存本地
+            case R.id.btn_save:
+
+                savePic(picUrl);
+                mPopWindow.dismiss();
+                break;
+                //复制粘贴板
+            case R.id.btn_cp:
+                ClipboardManager mClipboardManager =
+                        (ClipboardManager) activity.getSystemService(CLIPBOARD_SERVICE);
+                ClipData mClipData;
+                mClipData = ClipData.newPlainText("test", picUrl);
+                mClipboardManager.setPrimaryClip(mClipData);
+                Toast.makeText(activity, "复制成功", Toast.LENGTH_SHORT).show();
+                mPopWindow.dismiss();
+                break;
+            case R.id.btn_cancel:
+                if (mPopWindow!=null){
+                    mPopWindow.dismiss();
+                }
+                break;
+        }
+    }
 }
