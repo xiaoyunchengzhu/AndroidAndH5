@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">AndroidAndH5</string>
+    <string name="app_name">同城约聊</string>
+    <string name="loading">加载中...</string>
 </resources>

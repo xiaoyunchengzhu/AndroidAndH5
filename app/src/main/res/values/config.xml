@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--这里输入横幅广告ID，输入不需要广告留空即可-->
+    <string name="banner_ad_unit_id" translatable="false"></string>
+    <!--这里输入插页广告ID，输入不需要广告留空即可-->
+    <string name="interstitial_ad_unit_id" translatable="false"></string>
+    <!--这里输入广告ID，输入不需要广告留空即可-->
+    <string name="ad_app_id" translatable="false"></string>
+    <!--这里输入Admob ID，输入不需要广告留空即可-->
+    <string name="test_device_id" translatable="false"></string>
+    <!--这里是插页广告显示时间，也就是多少时间显示一次插页广告，如果没有输入上面广告ID，就无效-->
+    <string name="interval_time" translatable="false"></string>
+    <!--这里输入你网站域名支持http或https，如果加载本地HTML请填写index.html-->
+    <string name="target_url" translatable="false">http://hanyxmpt09.cloud31.49host.com</string>
+    <!--这里设置是底部工具栏，如果不需要工具栏请留空，需要就填写true-->
+    <string name="toolbar" translatable="false"></string>
+    <!--这里设置是APP内缩放选项，如果不需要请留空，需要就填写true-->
+    <string name="zoom" translatable="false"></string>
+    <string name="hide_status_bar" translatable="false"></string>
+    <string name="cache" translatable="true"></string>
+    <!--这里设置是下拉刷新，如果不需要就留空，需要就填写true -->
+    <string name="pullToRefresh" translatable="false">true</string>
+</resources>

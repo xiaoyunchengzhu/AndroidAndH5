@@ -65,11 +65,12 @@ public class WebViewManger implements View.OnClickListener{
         webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setAllowFileAccess(true);
         webView.getSettings().setAllowFileAccessFromFileURLs(true);
+        webView.getSettings().setSupportZoom(true);
         //添加useragent
         String ua = webView.getSettings().getUserAgentString();
         webView.getSettings().setUserAgentString(ua + " " + "");
         //阻塞加载图片
-        webView.getSettings().setBlockNetworkImage(true);
+//        webView.getSettings().setBlockNetworkImage(true);
         webView.setWebChromeClient(new CustomWebChromClient(activity, WebViewActivity.FILECHOOSER_RESULTCODE, WebViewActivity.REQUEST_SELECT_FILE));
         webView.addJavascriptInterface(new AndroidToJs(activity, webView), "LocalNative");
         setCookie();
@@ -95,8 +96,8 @@ public class WebViewManger implements View.OnClickListener{
             cookieManager.setAcceptCookie(true);
         }
         CookieManager.setAcceptFileSchemeCookies(true);
-        cookieManager.setCookie("www.baidu.com","name:chengzhu;password:123456");
-        Log.i("cookie",cookieManager.getCookie("www.baidu.com"));
+        cookieManager.setCookie("www.chehngzhu.com","name:chengzhu;password:123456");
+        Log.i("cookie",cookieManager.getCookie("www.chehngzhu.com"));
     }
     private String picUrl=null;
     private int x,y;
@@ -155,7 +156,7 @@ public class WebViewManger implements View.OnClickListener{
     private void saveBitmap(Bitmap bitmap) {
         File appDir = new File(Environment.getExternalStorageDirectory(), "com.xiaoyunchengzhu.androidandh5");
         if (!appDir.exists()) {
-            appDir.mkdir();
+            appDir.mkdirs();
         }
         String[] str = picUrl.split("/");
         String fileName = str[str.length - 1];
@@ -219,5 +220,9 @@ public class WebViewManger implements View.OnClickListener{
                 }
                 break;
         }
+    }
+
+    public WebView getWebView() {
+        return webView;
     }
 }
