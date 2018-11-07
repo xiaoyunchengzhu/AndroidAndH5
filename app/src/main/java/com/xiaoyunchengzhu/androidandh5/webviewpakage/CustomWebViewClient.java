@@ -76,7 +76,17 @@ public class CustomWebViewClient extends WebViewClient {
             view.getSettings().setLoadsImagesAutomatically(true);
         }
         super.onPageFinished(view, url);
+        ((WebViewActivity)context).hideStatusBar();
+        ((WebViewActivity)context).setToolbarButtonColor();
         ((WebViewActivity)context).showContent();
+        ProgressDialogHelper.dismissProgress();
+    }
+
+    @Override
+    public void onPageCommitVisible(WebView view, String url) {
+        super.onPageCommitVisible(view, url);
+        ((WebViewActivity)context).setToolbarButtonColor();
+        ((WebViewActivity)context).hideStatusBar();
         ProgressDialogHelper.dismissProgress();
     }
 
@@ -93,6 +103,7 @@ public class CustomWebViewClient extends WebViewClient {
         if (view.getUrl().equals(request.getUrl())) {
             view.loadUrl("file:///android_asset/error.html");
         }
+        ((WebViewActivity)context).hideStatusBar();
         ProgressDialogHelper.dismissProgress();
     }
 
@@ -104,6 +115,7 @@ public class CustomWebViewClient extends WebViewClient {
             return;
         }
         handler.proceed();
+        ((WebViewActivity)context).hideStatusBar();
         ProgressDialogHelper.dismissProgress();
     }
 }

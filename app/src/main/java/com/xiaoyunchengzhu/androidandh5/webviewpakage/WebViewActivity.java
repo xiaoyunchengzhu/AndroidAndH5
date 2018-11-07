@@ -39,7 +39,11 @@ public class WebViewActivity extends Activity implements DownloadListener, Swipe
     private WebView webView;
     private SwipeRefreshLayout mSwipeToRefresh;
     private ImageView mImageViewSplash;
+    private ImageView mBack;
+    private ImageView mForward;
     public boolean show_content=true;
+    public String mCameraPhotoPath;
+    public Uri mCapturedImageURI = null;
     private String urlData, currentUrl, contentDisposition, mimeType;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,18 +179,18 @@ public class WebViewActivity extends Activity implements DownloadListener, Swipe
             }
         }
     }
-//    public void setToolbarButtonColor() {
-//        if (false) {
-//            if (webView.canGoBack()) {
-//                mBack.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary));
-//            } else {
-//                mBack.setColorFilter(ContextCompat.getColor(this, R.color.gray));
-//            }
-//            if (mWebview.canGoForward()) {
-//                mForward.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary));
-//            } else {
-//                mForward.setColorFilter(ContextCompat.getColor(this, R.color.gray));
-//            }
-//        }
-//    }
+    public void setToolbarButtonColor() {
+        if (false) {
+            if (webView.canGoBack()) {
+                mBack.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary));
+            } else {
+                mBack.setColorFilter(ContextCompat.getColor(this, R.color.gray));
+            }
+            if (webView.canGoForward()) {
+                mForward.setColorFilter(ContextCompat.getColor(this, R.color.colorPrimary));
+            } else {
+                mForward.setColorFilter(ContextCompat.getColor(this, R.color.gray));
+            }
+        }
+    }
 }

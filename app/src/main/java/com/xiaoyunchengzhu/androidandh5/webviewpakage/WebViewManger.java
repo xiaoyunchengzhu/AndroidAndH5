@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.CookieManager;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.PopupWindow;
@@ -61,17 +62,38 @@ public class WebViewManger implements View.OnClickListener{
     //{"app":"TongLian","systemVersion":"8.0","systemPlatform":"android"}          user-agent
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
     private void inite() {
-        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.getSettings().setAllowFileAccess(true);
-        webView.getSettings().setAllowFileAccessFromFileURLs(true);
-        webView.getSettings().setSupportZoom(true);
-        //添加useragent
-        String ua = webView.getSettings().getUserAgentString();
-        webView.getSettings().setUserAgentString(ua + " " + "");
+//        webView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+//        webView.getSettings().setJavaScriptEnabled(true);
+//        webView.getSettings().setAllowFileAccess(true);
+//        webView.getSettings().setAllowFileAccessFromFileURLs(true);
+//        webView.getSettings().setSupportZoom(true);
+//        //添加useragent
+//        String ua = webView.getSettings().getUserAgentString();
+//        webView.getSettings().setUserAgentString(ua + " " + "");
+
+
+        WebSettings webSettings=webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+        webSettings.setJavaScriptCanOpenWindowsAutomatically(true);
+        webSettings.setSupportMultipleWindows(true);
+        webSettings.setGeolocationEnabled(true);
+        webSettings.setDomStorageEnabled(true);
+        webSettings.setDatabaseEnabled(true);
+        webSettings.setGeolocationEnabled(true);
+        webSettings.setGeolocationDatabasePath(activity.getFilesDir().getPath());
+        webSettings.setLoadWithOverviewMode(true);
+        webSettings.setAllowFileAccess(true);
+        webSettings.setUserAgentString(webSettings.getUserAgentString()+" Android");
+        if (false) {
+            webSettings.setAppCacheEnabled(true);
+            webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
+            webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        }
+
+
         //阻塞加载图片
 //        webView.getSettings().setBlockNetworkImage(true);
-        webView.setWebChromeClient(new CustomWebChromClient(activity, WebViewActivity.FILECHOOSER_RESULTCODE, WebViewActivity.REQUEST_SELECT_FILE));
+        webView.setWebChromeClient(new SuperWebChromClient(activity, WebViewActivity.FILECHOOSER_RESULTCODE, WebViewActivity.REQUEST_SELECT_FILE));
         webView.addJavascriptInterface(new AndroidToJs(activity, webView), "LocalNative");
         setCookie();
         imageInit();
@@ -156,7 +178,7 @@ public class WebViewManger implements View.OnClickListener{
     private void saveBitmap(Bitmap bitmap) {
         File appDir = new File(Environment.getExternalStorageDirectory(), "com.xiaoyunchengzhu.androidandh5");
         if (!appDir.exists()) {
-            appDir.mkdirs();
+            appDir.mkdir();
         }
         String[] str = picUrl.split("/");
         String fileName = str[str.length - 1];
