@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-    <android.support.v4.widget.SwipeRefreshLayout
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeToRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -12,7 +12,7 @@
             android:id="@+id/WebViewActivityWebView"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     <ImageView
         android:id="@+id/image_splash"
         android:layout_width="match_parent"

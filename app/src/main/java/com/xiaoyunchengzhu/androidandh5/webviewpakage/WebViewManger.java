@@ -12,6 +12,7 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -27,11 +28,6 @@ import android.widget.SeekBar;
 import android.widget.Toast;
 
 import com.xiaoyunchengzhu.androidandh5.R;
-import com.xiaoyunchengzhu.httpapi.http.HttpApi;
-import com.xiaoyunchengzhu.httpapi.net.APIManager;
-import com.xiaoyunchengzhu.httpapi.net.Api;
-import com.xiaoyunchengzhu.httpapi.net.BitmapCallBackResult;
-import com.xiaoyunchengzhu.httpapi.net.CallBackResult;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -162,17 +158,13 @@ public class WebViewManger implements View.OnClickListener{
         });
     }
     public void savePic(String url) {
-        APIManager.createApi(new HttpApi(url)).execute(new BitmapCallBackResult() {
-            @Override
-            public void success(Api api, Bitmap result) {
-                saveBitmap(result);
-            }
+        String[] str = picUrl.split("/");
+        String fileName = str[str.length - 1];
+        if (fileName.length()>20) {
+            fileName=fileName.substring(fileName.length()-10,fileName.length());
+        }
+        OkhttpDownloadFile.getInstance(activity,new Handler(activity.getMainLooper())).downloadFile(url,fileName);
 
-            @Override
-            public void failure(Api api, String error) {
-                Toast.makeText(activity, "保存失败", Toast.LENGTH_SHORT).show();
-            }
-        });
 
     }
     private void saveBitmap(Bitmap bitmap) {
